@@ -1,8 +1,8 @@
 {
-  "name": "directorio-revistas",
+  "name": "minaamp-electoral",
   "version": "0.0.1",
-  "description": " Directorio de Revistas del Observatorio Nacional de Ciencia, Tecnología e Innovación )ONCTI)",
-  "productName": "Directorio de Revistas del Observatorio Nacional de Ciencia, Tecnología e Innovación )ONCTI)",
+  "description": "Seguimiento y Movilización Electoral - MINAAMP",
+  "productName": "Seguimiento y Movilización Electoral - MINAAMP",
   "author": "cmarrerodb <cmarrerodb@gmail.com>",
   "private": true,
   "scripts": {

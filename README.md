@@ -1,6 +1,6 @@
-# Directorio de Revistas del Observatorio Nacional de Ciencia, Tecnología e Innovación )ONCTI) (directorio-revistas)
+# Seguimiento y Movilización Electoral - MINAAMP (minaamp-electoral)
 
- Directorio de Revistas del Observatorio Nacional de Ciencia, Tecnología e Innovación )ONCTI)
+ Seguimiento y Movilización Electoral - MINAAMP
 
 ## Install the dependencies
 ```bash

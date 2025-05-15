@@ -8,7 +8,7 @@
           <q-avatar>
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
           </q-avatar>
-          Directorio de Revistas Científicas Venezolanas
+          Seguimiento y Movilización Electoral MINAAMP
         </q-toolbar-title>
 
         <q-space />

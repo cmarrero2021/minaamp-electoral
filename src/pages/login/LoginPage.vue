@@ -1,21 +1,19 @@
 <template>
-  <div class="header">
-    <img alt="Logo" src="img/logo-nobg1.png" class="logo-left" />
-    <img alt="Observatorio Nacional de Ciencia, Tecnología e Innovación" src="img/oncti-nobg.png" class="logo-right" />
-  </div>
-  <div class="content-container">
-    <img alt="Directorio" src="public/img/directorio1.png" class="directorio-image" />
+  <div class="login-container">
+    <div class="background-image"></div>
+
+    <!-- Overlay oscuro para mejorar contraste del texto -->
+    <div class="overlay"></div>
+
+    <!-- Formulario centrado -->
     <div class="login-box">
-      <h5>Directorio de Revistas Científicas</h5>
       <h4>Iniciar Sesión</h4>
       <q-input filled outlined v-model="email" label="Correo Electrónico" type="email" />
       <q-input filled outlined v-model="password" label="Contraseña" type="password" />
-      <q-btn label="Ingresar" color="primary" @click="handleLogin" />
-      <q-btn flat label="¿Olvidaste tu contraseña?" @click="recoverPassword" />
+      <q-btn label="Ingresar" color="primary" @click="handleLogin" class="full-width" />
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
@@ -131,9 +129,9 @@ const recoverPassword = () => {
 }
 
 .content-container {
-  display: flex;
+  // display: flex;
   align-items: center;
-  justify-content: space-between;
+  // justify-content: space-between;
   padding: 20px;
 }
 
@@ -145,13 +143,79 @@ const recoverPassword = () => {
   border-radius: 5%;
 }
 
-.login-box {
-  background-color: white;
+.full-height {
+  display: flex;
+  justify-content: center; /* Centra horizontal */
+  align-items: center;      /* Centra vertical */
+  height: 100vh;            /* Altura completa de la pantalla */
+  width: 100%;              /* Ancho completo */
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 300px;
+  box-sizing: border-box;
+}
+
+.login-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to right, #0d47a1, #1565c0);
+  overflow: hidden;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #ffffff10,
+    #ffffff10 10px,
+    #ffffff20 10px,
+    #ffffff20 20px
+  );
+  z-index: 0;
+  opacity: 0.2;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro semi-transparente */
+  z-index: 1;
+}
+
+.login-box {
+  animation: fadeInUp 0.6s ease-out;
+  position: relative;
+  z-index: 2;
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
   text-align: center;
+  transition: all 0.3s ease;
+
+  h4 {
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #1976d2;
+  }
+
+  .q-btn {
+    margin-top: 15px;
+  }
+}
+
+.full-width {
+  width: 100%;
 }
 
 .q-tab__label {
@@ -187,8 +251,11 @@ const recoverPassword = () => {
   }
 
   .login-box {
-    width: 100%;
-    max-width: 300px;
+    // width: 100%;
+    // max-width: 300px;
+    padding: 20px;
+    max-width: 90%;
+    border-radius: 8px;
   }
 }
 </style>

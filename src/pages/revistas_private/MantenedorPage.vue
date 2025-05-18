@@ -103,20 +103,20 @@
                 <q-input v-model="editForm.hora_voto" label="Votó" type="time" filled />
               </div>
               <div class="col-12 col-md-6">
-                <q-select v-model="editForm.institucion" :options="optionsu.institucion" label="Institución" filled option-label="label"
-                  option-value="value" />
+                <q-select v-model="editForm.institucion" :options="optionsu.institucion" label="Institución" filled
+                  option-label="label" option-value="value" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select v-model="editForm.sede" :options="optionsu.sede" label="Sede" filled
-                  option-label="label" option-value="value" />
+                <q-select v-model="editForm.sede" :options="optionsu.sede" label="Sede" filled option-label="label"
+                  option-value="value" />
               </div>
               <div class="col-12 col-md-6">
                 <q-select v-model="editForm.area" :options="optionsu.area" label="Área" filled option-label="label"
                   option-value="value" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select v-model="editForm.estado" :options="optionsu.estado" label="Estado" filled option-label="label"
-                  option-value="value" />
+                <q-select v-model="editForm.estado" :options="optionsu.estado" label="Estado" filled
+                  option-label="label" option-value="value" />
               </div>
               <div class="col-12">
                 <q-input v-model="editForm.observaciones" label="Observaciones" type="textarea" filled
@@ -159,7 +159,9 @@ const servidoresURL = import.meta.env.VITE_LS_SERVERS_URL
 const institucionesURL = import.meta.env.VITE_LS_INSTITUTIONS_URL;
 const sedesURL = import.meta.env.VITE_LS_SEDES_URL;
 const areasURL = import.meta.env.VITE_LS_AREAS_URL;
-const servidorDetailURL = import.meta.env.VITE_BC_SERVER_URL; //Detalle del servidor
+const servidorDetailURL = import.meta.env.VITE_BC_SERVER_URL;
+const updateServerURL = import.meta.env.VITE_UP_SERVER_URL;
+
 
 // Estado de la aplicación
 const journals = ref([]);
@@ -345,13 +347,14 @@ const openNewModal = () => {
     resumen: '',
     portada: null
   };
+  editDialog.value = true;
+  isEditing.value = false;
 };
 
 // Función para abrir el modal de edición
 const openEditModal = async (journal) => {
   try {
     const response = await axios.get(`${servidorDetailURL}${journal.cedula}`);
-    console.log("response: ",response);
     editForm.value = { ...response.data };
     editDialog.value = true;
     isEditing.value = true;
@@ -366,47 +369,26 @@ const closeEditModal = () => {
 };
 
 const saveChanges = async () => {
-  // try {
-  const areaConocimientoId = editForm.value.areas?.value;
-  const indiceId = editForm.value.indice?.value;
-  const idiomaId = editForm.value.idioma?.value;
-  const editorialId = editForm.value.editorial?.value;
-  const periodicidadId = editForm.value.periodicidad?.value;
-  const formatoId = editForm.value.formato?.value;
-  const estadoId = editForm.value.estado?.value;
-  const revistaData = {
-    areas_id: areaConocimientoId,
-    indice_id: indiceId,
-    idioma_id: idiomaId,
-    revista: editForm.value.revista,
-    correo_revista: editForm.value.correo_revista,
-    editorial_id: editorialId,
-    periodicidad_id: periodicidadId,
-    formato_id: formatoId,
-    estado_id: estadoId,
-    nombres_editor: editForm.value.nombres_editor,
-    apellidos_editor: editForm.value.apellidos_editor,
-    correo_editor: editForm.value.correo_editor,
-    deposito_legal_impreso: editForm.value.deposito_legal_impreso,
-    deposito_legal_digital: editForm.value.deposito_legal_digital,
-    issn_impreso: editForm.value.issn_impreso,
-    issn_digital: editForm.value.issn_digital,
-    url: editForm.value.url,
-    anio_inicial: editForm.value.anio_inicial,
-    direccion: editForm.value.direccion,
-    telefono: editForm.value.telefono,
-    resumen: editForm.value.resumen,
+  try {
+  const servidorData = {
+    area_id: editForm.value.area_id,
+    institucion_id: editForm.value.institucion_id,
+    sede_id: editForm.value.sede_id,
+    cedula: editForm.value.cedula,
+    nombres: editForm.value.nombres?.toUpperCase() ?? ' ',
+    hora_voto: editForm.value.hora_voto || null,
+    observaciones: editForm.value.observaciones?.toUpperCase() ?? ' ',
   };
   if (isEditing.value) {
     // Modo edición
-    await axios.patch(`${updateURL}${editForm.value.id}`, revistaData);
+    await axios.patch(`${updateServerURL}${editForm.value.cedula}`, servidorData);
     Notify.create({
       type: 'positive',
       message: 'Los cambios se han guardado correctamente.'
     });
   } else {
     // Modo creación
-    await axios.post(insertURL, revistaData);
+    await axios.post(insertURL, servidorData);
     Notify.create({
       type: 'positive',
       message: 'La revista se ha creado correctamente.'
@@ -416,13 +398,13 @@ const saveChanges = async () => {
   // Actualizar la lista de revistas
   await fetchJournals();
   closeEditModal();
-  // } catch (error) {
-  //   console.error('Error al guardar los cambios:', error);
-  //   Notify.create({
-  //     type: 'negative',
-  //     message: 'Ha ocurrido un error al guardar los cambios.'
-  //   });
-  // }
+  } catch (error) {
+    console.error('Error al guardar los cambios:', error);
+    Notify.create({
+      type: 'negative',
+      message: 'Ha ocurrido un error al guardar los cambios.'
+    });
+  }
 };
 
 

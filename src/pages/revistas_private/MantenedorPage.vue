@@ -82,7 +82,7 @@
     <q-dialog v-model="editDialog" persistent>
       <q-card style="width: 700px; max-width: 80vw;">
         <q-card-section>
-          <div class="text-h6">{{ isEditing ? 'Editar Revista' : 'Nueva Revista' }}</div>
+          <div class="text-h6">{{ isEditing ? 'Editar Servidor' : 'Cargar Servidor' }}</div>
         </q-card-section>
 
         <q-card-section>
@@ -93,88 +93,34 @@
                 <q-input v-model="editForm.id" label="ID" readonly filled />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="editForm.revista" label="Revista" filled
-                  @input="editForm.revista = $event.toUpperCase()" />
+                <q-input v-model="editForm.cedula" label="Cédula" type="number" filled />
               </div>
               <div class="col-12 col-md-6">
-                <q-select v-model="editForm.areas" :options="optionsu.areas" label="Áreas" filled option-label="label"
+                <q-input v-model="editForm.nombres" label="Nombres" filled
+                  @input="editForm.nombres = $event.toUpperCase()" />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-input v-model="editForm.hora_voto" label="Votó" type="time" filled />
+              </div>
+              <div class="col-12 col-md-6">
+                <q-select v-model="editForm.institucion" :options="optionsu.institucion" label="Institución" filled option-label="label"
                   option-value="value" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select v-model="editForm.indice" :options="optionsu.indice" label="Índice" filled
+                <q-select v-model="editForm.sede" :options="optionsu.sede" label="Sede" filled
                   option-label="label" option-value="value" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select v-model="editForm.idioma" :options="optionsu.idioma" label="Idioma" filled
-                  option-label="label" option-value="value" />
+                <q-select v-model="editForm.area" :options="optionsu.area" label="Área" filled option-label="label"
+                  option-value="value" />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="editForm.correo_revista" label="Correo de la Revista" type="email" filled />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select v-model="editForm.editorial" :options="optionsu.editorial" label="Editorial" filled
-                  option-label="label" option-value="value" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select v-model="editForm.periodicidad" :options="optionsu.periodicidad" label="Periodicidad" filled
-                  option-label="label" option-value="value" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select v-model="editForm.formato" :options="optionsu.formato" label="Formato" filled
-                  option-label="label" option-value="value" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select v-model="editForm.estado" :options="optionsu.estado" label="Estado" filled
-                  option-label="label" option-value="value" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.ciudad" label="Ciudad" filled
-                  @input="editForm.ciudad = $event.toUpperCase()" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.nombres_editor" label="Nombres del Editor" filled
-                  @input="editForm.nombres_editor = $event.toUpperCase()" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.apellidos_editor" label="Apellidos del Editor" filled
-                  @input="editForm.apellidos_editor = $event.toUpperCase()" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.correo_editor" label="Correo del Editor" type="email" filled />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.deposito_legal_impreso" label="Depósito Legal Impreso" filled
-                  @input="editForm.deposito_legal_impreso = $event.toUpperCase()" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.deposito_legal_digital" label="Depósito Legal Digital" filled
-                  @input="editForm.deposito_legal_digital = $event.toUpperCase()" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.issn_impreso" label="ISSN Impreso" filled
-                  @input="editForm.issn_impreso = $event.toUpperCase()" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.issn_digital" label="ISSN Digital" filled
-                  @input="editForm.issn_digital = $event.toUpperCase()" />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.url" label="URL" type="url" filled />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input v-model="editForm.anio_inicial" label="Año Inicial" type="number" filled />
+                <q-select v-model="editForm.estado" :options="optionsu.estado" label="Estado" filled option-label="label"
+                  option-value="value" />
               </div>
               <div class="col-12">
-                <q-input v-model="editForm.direccion" label="Dirección" filled
-                  @input="editForm.direccion = $event.toUpperCase()" />
-              </div>
-              <div class="col-12">
-                <q-input v-model="editForm.telefono" label="Teléfono" filled
-                  @input="editForm.telefono = $event.toUpperCase()" />
-              </div>
-              <div class="col-12">
-                <q-input v-model="editForm.resumen" label="Resumen" type="textarea" filled
-                  @input="editForm.resumen = $event.toUpperCase()" />
+                <q-input v-model="editForm.observaciones" label="Observaciones" type="textarea" filled
+                  @input="editForm.observaciones = $event.toUpperCase()" />
               </div>
             </div>
             <div class="row justify-end">
@@ -213,6 +159,7 @@ const servidoresURL = import.meta.env.VITE_LS_SERVERS_URL
 const institucionesURL = import.meta.env.VITE_LS_INSTITUTIONS_URL;
 const sedesURL = import.meta.env.VITE_LS_SEDES_URL;
 const areasURL = import.meta.env.VITE_LS_AREAS_URL;
+const servidorDetailURL = import.meta.env.VITE_BC_SERVER_URL; //Detalle del servidor
 
 // Estado de la aplicación
 const journals = ref([]);
@@ -403,18 +350,13 @@ const openNewModal = () => {
 // Función para abrir el modal de edición
 const openEditModal = async (journal) => {
   try {
-    const response = await axios.get(`${revistaDetailURL}${journal.id}`);
+    const response = await axios.get(`${servidorDetailURL}${journal.cedula}`);
+    console.log("response: ",response);
     editForm.value = { ...response.data };
-
-    // Cargar imagen existente si existe
-    if (editForm.value.id) {
-      imagePreview.value = `${imageBaseUrl}revistas/${editForm.value.id}/portada.jpg?t=${Date.now()}`;
-    }
-
     editDialog.value = true;
     isEditing.value = true;
   } catch (error) {
-    console.error('Error al obtener los datos de la revista:', error);
+    console.error('Error al obtener los datos del servidor:', error);
   }
 };
 ////////////////////////

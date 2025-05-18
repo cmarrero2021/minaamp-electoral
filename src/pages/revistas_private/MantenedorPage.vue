@@ -26,7 +26,7 @@
         </div>
 
         <!-- Segunda fila: Filtros para las columnas -->
-        <div class="full-width row wrap justify-between items-center content-center q-mb-md">
+        <div class="full-width row wrap  items-center content-center q-mb-md">
           <div class="col-xs-12 col-sm-6 col-md-3 q-pa-sm" v-for="col in columns" :key="col.name">
             <div v-if="col.filterable">
               <div v-if="col.type === 'select'">
@@ -98,8 +98,8 @@
                   @input="editForm.revista = $event.toUpperCase()" />
               </div>
               <div class="col-12 col-md-6">
-                <q-select v-model="editForm.area_conocimiento" :options="optionsu.area_conocimiento"
-                  label="Área de Conocimiento" filled option-label="label" option-value="value" />
+                <q-select v-model="editForm.areas" :options="optionsu.areas"
+                  label="Áreas" filled option-label="label" option-value="value" />
               </div>
               <div class="col-12 col-md-6">
                 <q-select v-model="editForm.indice" :options="optionsu.indice" label="Índice" filled
@@ -218,24 +218,24 @@ const uploadingImage = ref(false);
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL || 'http://poi-r.vps.co.ve/apiq/public/portadas/';
 // Definición de columnas para la tabla
 const columns = [
-  { name: 'actions', label: 'Acciones', align: 'left' },
-  { name: 'id', label: 'ID', field: 'id', sortable: true, filterable: true, align: 'left', type: 'text' },
-  { name: 'revista', label: 'Revista', field: 'revista', sortable: true, filterable: true, align: 'left', type: 'text' },
-  { name: 'area_conocimiento', label: 'Área de Conocimiento', field: 'area_conocimiento', sortable: true, filterable: true, align: 'left', type: 'select' },
-  { name: 'idioma', label: 'Idioma', field: 'idioma', sortable: true, filterable: true, align: 'left', type: 'select' },
-  { name: 'editorial', label: 'Editorial', field: 'editorial', sortable: true, filterable: true, align: 'left', type: 'select' },
+  // { name: 'actions', label: 'Acciones', align: 'left' },
+  // { name: 'id', label: 'ID', field: 'id', sortable: true, filterable: true, align: 'left', type: 'text' },
+  // { name: 'revista', label: 'Revista', field: 'revista', sortable: true, filterable: true, align: 'left', type: 'text' },
+  { name: 'institucion', label: 'Instituciones', field: 'institucion', sortable: true, filterable: true, align: 'left', type: 'select' },
+  { name: 'sedes', label: 'Sedes', field: 'sede', sortable: true, filterable: true, align: 'left', type: 'select' },
+  { name: 'areas', label: 'Áreas', field: 'areas', sortable: true, filterable: true, align: 'left', type: 'select' },
   { name: 'estado', label: 'Estado', field: 'estado', sortable: true, filterable: true, align: 'left', type: 'select' },
-  { name: 'indice', label: 'Índice', field: 'indice', sortable: true, filterable: true, align: 'left', type: 'select' },
-  { name: 'deposito_legal_impreso', label: 'Depósito Legal Impreso', field: 'deposito_legal_impreso', sortable: true, filterable: true, align: 'left', type: 'text' },
-  { name: 'deposito_legal_digital', label: 'Depósito Legal Digital', field: 'deposito_legal_digital', sortable: true, filterable: true, align: 'left', type: 'text' },
-  { name: 'issn_impreso', label: 'ISSN Impreso', field: 'issn_impreso', sortable: true, filterable: true, align: 'left', type: 'text' },
-  { name: 'issn_digital', label: 'ISSN Digital', field: 'issn_digital', sortable: true, filterable: true, align: 'left', type: 'text' },
-  { name: 'anio_inicial', label: 'Año Inicial', field: 'anio_inicial', sortable: true, filterable: true, align: 'left', type: 'text' }
+  // { name: 'indice', label: 'Índice', field: 'indice', sortable: true, filterable: true, align: 'left', type: 'select' },
+  { name: 'deposito_legal_impreso', label: 'Cédula', field: 'deposito_legal_impreso', sortable: true, filterable: true, align: 'left', type: 'text' },
+  { name: 'deposito_legal_digital', label: 'Nombre', field: 'deposito_legal_digital', sortable: true, filterable: true, align: 'left', type: 'text' },
+  // { name: 'issn_impreso', label: 'ISSN Impreso', field: 'issn_impreso', sortable: true, filterable: true, align: 'left', type: 'text' },
+  // { name: 'issn_digital', label: 'ISSN Digital', field: 'issn_digital', sortable: true, filterable: true, align: 'left', type: 'text' },
+  // { name: 'anio_inicial', label: 'Año Inicial', field: 'anio_inicial', sortable: true, filterable: true, align: 'left', type: 'text' }
 ];
 
 // URLs de los endpoints
 const apiURL = import.meta.env.VITE_API_URL || 'http://poi-r.vps.co.ve:3000/';
-const areasURL = import.meta.env.VITE_AREASR_BASE_URL || 'http://poi-r.vps.co.ve:3000/areas_revistas';
+// const areasURL = import.meta.env.VITE_AREASR_BASE_URL || 'http://poi-r.vps.co.ve:3000/areas_revistas';
 const idiomasURL = import.meta.env.VITE_IDIOMASR_BASE_URL || 'http://poi-r.vps.co.ve:3000/idiomas_revistas';
 const editorialesURL = import.meta.env.VITE_EDITORIALR_BASE_URL || 'http://poi-r.vps.co.ve:3000/editorial_revistas';
 const estadosURL = import.meta.env.VITE_ESTADOR_BASE_URL || 'http://poi-r.vps.co.ve:3000/estado_revistas';
@@ -254,6 +254,11 @@ const indicesLsURL = import.meta.env.VITE_LS_INDICES_URL || 'http://poi-r.vps.co
 const periodicidadLsURL = import.meta.env.VITE_LS_PERIODICIDAD_URL || 'http://poi-r.vps.co.ve:3000/lista_indices';
 const formatosLsURL = import.meta.env.VITE_LS_FORMATOS_URL || 'http://poi-r.vps.co.ve:3000/lista_indices';
 
+const servidoresURL = import.meta.env.VITE_LS_SERVERS_URL
+const institucionesURL = import.meta.env.VITE_LS_INSTITUTIONS_URL;
+const sedesURL = import.meta.env.VITE_LS_SEDES_URL;
+const areasURL = import.meta.env.VITE_LS_AREAS_URL;
+
 // Estado de la aplicación
 const journals = ref([]);
 const loading = ref(true);
@@ -269,25 +274,25 @@ const searchQuery = ref('');
 
 // Filtros para las columnas
 const filters = ref({
-  area_conocimiento: null,
-  idioma: null,
-  editorial: null,
+  areas: null,
+  institucion: null,
+  sede: null,
   estado: null,
   indice: null
 });
 
 // Opciones para los select
 const options = ref({
-  area_conocimiento: [],
-  idioma: [],
-  editorial: [],
+  areas: [],
+  institucion: [],
+  sede: [],
   estado: [],
   indice: []
 });
 const optionsu = ref({
-  area_conocimiento: [],
-  idioma: [],
-  editorial: [],
+  areas: [],
+  institucion: [],
+  sede: [],
   estado: [],
   indice: []
 });
@@ -316,28 +321,29 @@ const fetchJournals = async () => {
 const fetchOptions = async () => {
   try {
     const areasResponse = await axios.get(areasURL);
-    options.value.area_conocimiento = areasResponse.data.map(item => item.area_conocimiento);
-    const areasResponseU = await axios.get(areasLsURL);
-    optionsu.value.area_conocimiento = areasResponseU.data.map(item => ({
-      label: item.area_conocimiento,
-      value: item.id_area_conocimiento
+    options.value.areas = areasResponse.data.map(item => item.area);
+    const areasResponseU = await axios.get(areasURL);
+    optionsu.value.area = areasResponseU.data.map(item => ({
+      label: item.area,
+      value: item.area_id
     }));
 
-    // Obtener idiomas
-    const idiomasResponse = await axios.get(idiomasURL);
-    options.value.idioma = idiomasResponse.data.map(item => item.idioma);
-    const idiomasResponseU = await axios.get(idiomasLsURL);
-    optionsu.value.idioma = idiomasResponseU.data.map(item => ({
-      label: item.idioma,
-      value: item.id_idioma
+    // Obtener instituciones
+    const institucionsResponse = await axios.get(institucionesURL);
+    options.value.institucion = institucionsResponse.data.map(item => item.institucion);
+    const institucionsResponseU = await axios.get(institucionesURL);
+    optionsu.value.institucion = institucionsResponseU.data.map(item => ({
+      label: item.institucion,
+      value: item.id
     }));
-    // Obtener editoriales
-    const editorialesResponse = await axios.get(editorialesURL);
-    options.value.editorial = editorialesResponse.data.map(item => item.editorial);
-    const editorialesResponseU = await axios.get(editorialesLsURL);
-    optionsu.value.editorial = editorialesResponseU.data.map(item => ({
-      label: item.editorial,
-      value: item.id_editorial
+    // Obtener sedes
+    const sedesResponse = await axios.get(sedesURL);
+    options.value.sedes = sedesResponse.data.map(item => item.sede);
+    const sedesResponseU = await axios.get(sedesURL);
+    console.log("sedesResponse: ",sedesResponse)
+    optionsu.value.sede = sedesResponseU.data.map(item => ({
+      label: item.sede,
+      value: item.id
     }));
 
     // Obtener estados
@@ -350,32 +356,32 @@ const fetchOptions = async () => {
     }));
 
     // Obtener índices
-    const indicesResponse = await axios.get(indicesURL);
-    options.value.indice = indicesResponse.data.map(item => item.indice);
-    const indicesResponseU = await axios.get(indicesLsURL);
-    optionsu.value.indice = indicesResponseU.data.map(item => ({
-      label: item.indice,
-      value: item.id_indice
-    }));
+    // const indicesResponse = await axios.get(indicesURL);
+    // options.value.indice = indicesResponse.data.map(item => item.indice);
+    // const indicesResponseU = await axios.get(indicesLsURL);
+    // optionsu.value.indice = indicesResponseU.data.map(item => ({
+    //   label: item.indice,
+    //   value: item.id_indice
+    // }));
 
 
-    // Obtener periodicidad
-    const periodicidadResponse = await axios.get(periodicidadURL);
-    periodicidadOptions.value = periodicidadResponse.data.map(item => item.periodicidad);
-    const periodicidadResponseU = await axios.get(periodicidadLsURL);
-    optionsu.value.periodicidad = periodicidadResponseU.data.map(item => ({
-      label: item.periodicidad,
-      value: item.id_periodicidad
-    }));
+    // // Obtener periodicidad
+    // const periodicidadResponse = await axios.get(periodicidadURL);
+    // periodicidadOptions.value = periodicidadResponse.data.map(item => item.periodicidad);
+    // const periodicidadResponseU = await axios.get(periodicidadLsURL);
+    // optionsu.value.periodicidad = periodicidadResponseU.data.map(item => ({
+    //   label: item.periodicidad,
+    //   value: item.id_periodicidad
+    // }));
 
     // Obtener formatos
-    const formatoResponse = await axios.get(formatosURL);
-    formatoOptions.value = formatoResponse.data.map(item => item.formato);
-    const formatoResponseU = await axios.get(formatosLsURL);
-    optionsu.value.formato = formatoResponseU.data.map(item => ({
-      label: item.formato,
-      value: item.id_formato
-    }));
+    // const formatoResponse = await axios.get(formatosURL);
+    // formatoOptions.value = formatoResponse.data.map(item => item.formato);
+    // const formatoResponseU = await axios.get(formatosLsURL);
+    // optionsu.value.formato = formatoResponseU.data.map(item => ({
+    //   label: item.formato,
+    //   value: item.id_formato
+    // }));
 
   } catch (error) {
     console.error('Error al obtener las opciones de los filtros:', error);
@@ -448,7 +454,7 @@ const openNewModal = () => {
     // Inicializa todos los campos necesarios
     id: null,
     revista: '',
-    area_conocimiento: null,
+    areas: null,
     indice: null,
     idioma: null,
     correo_revista: '',
@@ -586,7 +592,7 @@ const closeEditModal = () => {
 /*
 const saveChanges = async () => {
   try {
-    const areaConocimientoId = editForm.value.area_conocimiento.value;
+    const areaConocimientoId = editForm.value.areas.value;
     const indiceId = editForm.value.indice.value;
     const idiomaId = editForm.value.idioma.value;
     const editorialId = editForm.value.editorial.value;
@@ -596,7 +602,7 @@ const saveChanges = async () => {
     // Preparar el objeto con los IDs correspondientes
     const updatedData = {
       id: editForm.value.id,
-      area_conocimiento_id: areaConocimientoId,
+      areas_id: areaConocimientoId,
       indice_id: indiceId,
       idioma_id: idiomaId,
       revista: editForm.value.revista,
@@ -641,7 +647,7 @@ const saveChanges = async () => {
 
 const saveChanges = async () => {
   // try {
-  const areaConocimientoId = editForm.value.area_conocimiento?.value;
+  const areaConocimientoId = editForm.value.areas?.value;
   const indiceId = editForm.value.indice?.value;
   const idiomaId = editForm.value.idioma?.value;
   const editorialId = editForm.value.editorial?.value;
@@ -651,7 +657,7 @@ const saveChanges = async () => {
 
   const revistaData = {
     // id: 2,
-    area_conocimiento_id: areaConocimientoId,
+    areas_id: areaConocimientoId,
     indice_id: indiceId,
     idioma_id: idiomaId,
     revista: editForm.value.revista,

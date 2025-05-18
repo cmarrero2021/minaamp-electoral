@@ -32,7 +32,7 @@
           <q-item-section avatar>
             <q-icon name="menu_book" />
           </q-item-section>
-          <q-item-section>Revistas</q-item-section>
+          <q-item-section>Servidores</q-item-section>
         </q-item>
 
         <!-- Agrega más items según los permisos -->
@@ -86,7 +86,7 @@ const logout = async () => {
     })
 
     // Redirigir al login
-    router.push('/login')
+    router.push('/')
   } catch (error) {
     console.error('Error al cerrar sesión:', error)
     Notify.create({

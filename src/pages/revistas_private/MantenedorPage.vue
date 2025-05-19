@@ -96,8 +96,8 @@
                 <q-input v-model="editForm.cedula" label="Cédula" type="number" filled />
               </div>
               <div class="col-12 col-md-6">
-                <q-input v-model="editForm.nombres" label="Nombres" filled
-                  @input="editForm.nombres = $event.toUpperCase()" />
+                <q-input :model-value="editForm.nombres"
+                  @update:model-value="val => editForm.nombres = val.toUpperCase()" label="Nombres" filled />
               </div>
               <div class="col-12 col-md-6">
                 <q-input v-model="editForm.hora_voto" label="Votó" type="time" filled />
@@ -119,8 +119,9 @@
                   option-label="label" option-value="value" />
               </div>
               <div class="col-12">
-                <q-input v-model="editForm.observaciones" label="Observaciones" type="textarea" filled
-                  @input="editForm.observaciones = $event.toUpperCase()" />
+                <q-input :model-value="editForm.observaciones"
+                  @update:model-value="val => editForm.observaciones = val.toUpperCase()" label="Observaciones"
+                  type="textarea" filled />
               </div>
             </div>
             <div class="row justify-end">
@@ -161,6 +162,7 @@ const sedesURL = import.meta.env.VITE_LS_SEDES_URL;
 const areasURL = import.meta.env.VITE_LS_AREAS_URL;
 const servidorDetailURL = import.meta.env.VITE_BC_SERVER_URL;
 const updateServerURL = import.meta.env.VITE_UP_SERVER_URL;
+const insertServerURL = import.meta.env.VITE_IN_SERVER_URL;
 
 
 // Estado de la aplicación
@@ -323,29 +325,36 @@ const openNewModal = () => {
   editForm.value = {
     // Inicializa todos los campos necesarios
     id: null,
-    revista: '',
-    areas: null,
-    indice: null,
-    idioma: null,
-    correo_revista: '',
-    editorial: null,
-    periodicidad: null,
-    formato: null,
-    estado: null,
-    ciudad: '',
-    nombres_editor: '',
-    apellidos_editor: '',
-    correo_editor: '',
-    deposito_legal_impreso: '',
-    deposito_legal_digital: '',
-    issn_impreso: '',
-    issn_digital: '',
-    url: '',
-    anio_inicial: '',
-    direccion: '',
-    telefono: '',
-    resumen: '',
-    portada: null
+    area_id: null,
+    institucion_id: null,
+    sede_id: null,
+    cedula: null,
+    nombres: null,
+    hora_voto: null,
+    observaciones: null,
+    // revista: '',
+    // areas: null,
+    // indice: null,
+    // idioma: null,
+    // correo_revista: '',
+    // editorial: null,
+    // periodicidad: null,
+    // formato: null,
+    // estado: null,
+    // ciudad: '',
+    // nombres_editor: '',
+    // apellidos_editor: '',
+    // correo_editor: '',
+    // deposito_legal_impreso: '',
+    // deposito_legal_digital: '',
+    // issn_impreso: '',
+    // issn_digital: '',
+    // url: '',
+    // anio_inicial: '',
+    // direccion: '',
+    // telefono: '',
+    // resumen: '',
+    // portada: null
   };
   editDialog.value = true;
   isEditing.value = false;
@@ -370,39 +379,49 @@ const closeEditModal = () => {
 
 const saveChanges = async () => {
   try {
-  const servidorData = {
-    area_id: editForm.value.area_id,
-    institucion_id: editForm.value.institucion_id,
-    sede_id: editForm.value.sede_id,
-    cedula: editForm.value.cedula,
-    nombres: editForm.value.nombres?.toUpperCase() ?? ' ',
-    hora_voto: editForm.value.hora_voto || null,
-    observaciones: editForm.value.observaciones?.toUpperCase() ?? ' ',
-  };
-  if (isEditing.value) {
-    // Modo edición
-    await axios.patch(`${updateServerURL}${editForm.value.cedula}`, servidorData);
-    Notify.create({
-      type: 'positive',
-      message: 'Los cambios se han guardado correctamente.'
-    });
-  } else {
-    // Modo creación
-    await axios.post(insertURL, servidorData);
-    Notify.create({
-      type: 'positive',
-      message: 'La revista se ha creado correctamente.'
-    });
-  }
+    const servidorData = {
+      area_id: isEditing.value
+        ? editForm.value.area_id
+        : editForm.value.area?.value,
 
-  // Actualizar la lista de revistas
-  await fetchJournals();
-  closeEditModal();
+      institucion_id: isEditing.value
+        ? editForm.value.institucion_id
+        : editForm.value.institucion?.value,
+
+      sede_id: isEditing.value
+        ? editForm.value.sede_id
+        : editForm.value.sede?.value,
+
+      cedula: editForm.value.cedula,
+      nombres: editForm.value.nombres?.toUpperCase() ?? '',
+      hora_voto: editForm.value.hora_voto,
+      observaciones: editForm.value.observaciones?.toUpperCase() ?? '',
+    };
+    if (isEditing.value) {
+      // Modo edición
+      await axios.patch(`${updateServerURL}${editForm.value.cedula}`, servidorData);
+      Notify.create({
+        type: 'positive',
+        message: 'Los cambios se han guardado correctamente.'
+      });
+    } else {
+      // Modo creación
+      await axios.post(insertServerURL, servidorData);
+      Notify.create({
+        type: 'positive',
+        message: 'La revista se ha creado correctamente.'
+      });
+    }
+
+    // Actualizar la lista de revistas
+    await fetchJournals();
+    closeEditModal();
   } catch (error) {
-    console.error('Error al guardar los cambios:', error);
+    const cedula = servidorData.cedula;
+    const mensaje = error.response.status === 409 ? `La cédula ${cedula} ya se encuentra registrada.` : `Ha ocurrido un error ${error} y no se han guardar los cambios.`;
     Notify.create({
       type: 'negative',
-      message: 'Ha ocurrido un error al guardar los cambios.'
+      message: mensaje
     });
   }
 };

@@ -51,7 +51,7 @@
         </div>
         <div class="col-xs-2 col-sm-1">
           <q-btn icon="add" title="Agregar nueva revista" @click="openNewModal" color="positive" size="sm"
-            class="full-width" />
+            class="full-width" v-if="hasPermission('view_admin')" />
         </div>
       </template>
 
@@ -61,13 +61,12 @@
           <div class="row items-center">
             <!-- Botón Editar -->
             <q-btn icon="edit" color="primary" title="Editar servidor" size="xs" @click.stop="openEditModal(props.row)"
-              class="q-mr-xs" />
+              class="q-mr-xs" v-if="hasPermission('view_admin')" />
 
-            <!-- Botón Ver -->
-            <!-- <q-btn icon="visibility" color="positive" title="Ver servidor" size="xs" class="q-mr-xs" /> -->
-
+            <!-- Botón Marcas Votó -->
+            <q-btn icon="check" color="secondary" title="Marcar que el servidor votó" size="xs" class="q-mr-xs" v-if="hasPermission('view_admin')"/>
             <!-- Botón Borrar -->
-            <q-btn icon="delete" color="negative" title="Eliminar Servidor" size="xs" class="q-mr-xs" />
+            <q-btn icon="delete" color="negative" title="Eliminar Servidor" size="xs" class="q-mr-xs" v-if="hasPermission('view_admin')" />
           </div>
         </q-td>
       </template>
@@ -164,7 +163,11 @@ const servidorDetailURL = import.meta.env.VITE_BC_SERVER_URL;
 const updateServerURL = import.meta.env.VITE_UP_SERVER_URL;
 const insertServerURL = import.meta.env.VITE_IN_SERVER_URL;
 
-
+// Obtener permisos
+const hasPermission = (permissionName) => {
+  const permissions = LocalStorage.getItem('permissions') || []
+  return permissions.some(p => p.name === permissionName)
+}
 // Estado de la aplicación
 const journals = ref([]);
 const loading = ref(true);
@@ -332,29 +335,6 @@ const openNewModal = () => {
     nombres: null,
     hora_voto: null,
     observaciones: null,
-    // revista: '',
-    // areas: null,
-    // indice: null,
-    // idioma: null,
-    // correo_revista: '',
-    // editorial: null,
-    // periodicidad: null,
-    // formato: null,
-    // estado: null,
-    // ciudad: '',
-    // nombres_editor: '',
-    // apellidos_editor: '',
-    // correo_editor: '',
-    // deposito_legal_impreso: '',
-    // deposito_legal_digital: '',
-    // issn_impreso: '',
-    // issn_digital: '',
-    // url: '',
-    // anio_inicial: '',
-    // direccion: '',
-    // telefono: '',
-    // resumen: '',
-    // portada: null
   };
   editDialog.value = true;
   isEditing.value = false;

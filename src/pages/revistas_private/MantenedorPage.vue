@@ -78,7 +78,7 @@
               class="q-mr-xs" @click.stop="startQuickEdit(props.row)" v-if="hasPermission('view_admin')"/>
 
             <!-- Botón Borrar -->
-            <q-btn icon="delete" color="negative" title="Eliminar Servidor" size="xs"
+            <q-btn icon="delete" @click.stop="eliminarServidor(props.row)" color="negative" title="Eliminar Servidor" size="xs"
               class="q-mr-xs" v-if="hasPermission('view_admin')" />
           </div>
         </q-td>
@@ -246,6 +246,7 @@ const areasURL = import.meta.env.VITE_LS_AREAS_URL;
 const servidorDetailURL = import.meta.env.VITE_BC_SERVER_URL;
 const updateServerURL = import.meta.env.VITE_UP_SERVER_URL;
 const insertServerURL = import.meta.env.VITE_IN_SERVER_URL;
+const deleteServerURL = import.meta.env.VITE_BR_SERVER_URL;
 
 // Obtener permisos
 const hasPermission = (permissionName) => {
@@ -339,8 +340,6 @@ const fetchOptions = async () => {
       label: item.sede,
       value: item.id
     }));
-    console.table("area options: ",options.value.area)
-    console.table("area optionsu: ",optionsu.value.area)
 
     // Obtener estados
     const estadosResponse = await axios.get(estadosURL);
@@ -544,7 +543,52 @@ const saveQuickEdit = async (row) => {
 const handleTimeChange = (row) => {
   console.log('Hora cambiada:', editingRowData.value.hora_voto);
 };
+const eliminarServidor = async (servidor) => {
+  try {
+    // Mostrar diálogo de confirmación
+    const confirmacion = await new Promise((resolve) => {
+      Notify.create({
+        type: 'warning',
+        message: `¿Está seguro que desea eliminar el servidor ${servidor.nombres} (C.I. ${servidor.cedula})?`,
+        timeout: 0,
+        actions: [
+          {
+            label: 'Confirmar',
+            color: 'white',
+            handler: () => resolve(true)
+          },
+          {
+            label: 'Cancelar',
+            color: 'white',
+            handler: () => resolve(false)
+          }
+        ]
+      });
+    });
 
+    if (!confirmacion) return;
+
+    // Realizar la solicitud PATCH para borrado lógico
+    loading.value = true;
+    await axios.patch(`${deleteServerURL}${servidor.cedula}`);
+
+    Notify.create({
+      type: 'positive',
+      message: 'Servidor eliminado correctamente'
+    });
+
+    // Actualizar la lista
+    await fetchJournals();
+  } catch (error) {
+    console.error('Error al eliminar servidor:', error);
+    Notify.create({
+      type: 'negative',
+      message: error.response?.data?.message || 'Error al eliminar el servidor'
+    });
+  } finally {
+    loading.value = false;
+  }
+};
 // Observar cambios en la paginación
 watch(pagination, () => {
   // Lógica de paginación si es necesaria

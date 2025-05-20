@@ -21,7 +21,7 @@ const routes = [
     // ],
   },
   {
-    path: "/admin",
+    path: "/servers",
     component: () => import("layouts/MainLayout.vue"),
     meta: { requiresAuth: true },
     children: [
@@ -31,6 +31,18 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/massive_servers",
+    component: () => import("layouts/MainLayout.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        component: () => import("pages/revistas_private/ServidoresMasivosPage.vue"),
+      },
+    ],
+  },
+
   {
     path: "/inicio",
     component: () => import("layouts/MainLayout.vue"),
@@ -44,7 +56,9 @@ const routes = [
   },
   {
     path: "/:catchAll(.*)*",
-    component: () => import("layouts/InitialLayout.vue"),
+      component: () => import("pages/login/LoginPage.vue"),
+        // meta: { requiresGuest: true },
+    // component: () => import("layouts/InitialLayout.vue"),
   },
 ];
 

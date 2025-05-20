@@ -28,11 +28,17 @@
           </q-item-section>
           <q-item-section>Inicio</q-item-section>
         </q-item>
-        <q-item clickable v-ripple to="/admin" v-if="hasPermission('view_admin')">
+        <q-item clickable v-ripple to="/servers" v-if="hasPermission('view_admin')">
           <q-item-section avatar>
-            <q-icon name="menu_book" />
+            <q-icon name="person" />
           </q-item-section>
           <q-item-section>Servidores</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple to="/massive_servers" v-if="hasPermission('view_admin')">
+          <q-item-section avatar>
+            <q-icon name="people" />
+          </q-item-section>
+          <q-item-section>Carga masiva</q-item-section>
         </q-item>
 
         <!-- Agrega más items según los permisos -->
@@ -77,8 +83,8 @@ const logout = async () => {
     })
 
     // Limpiar el almacenamiento local
-    LocalStorage.remove('token')
-    LocalStorage.remove('permissions')
+    // LocalStorage.remove('token')
+    // LocalStorage.remove('permissions')
 
     Notify.create({
       message: 'Sesión cerrada correctamente',
@@ -86,15 +92,19 @@ const logout = async () => {
     })
 
     // Redirigir al login
-    router.push('/')
+    // router.push('/')
   } catch (error) {
+    // LocalStorage.remove('token')
+    // LocalStorage.remove('permissions')
+    console.error('Error al cerrar sesión:', error)
+    // Notify.create({
+    //   message: 'Error al cerrar sesión',
+    //   color: 'negative'
+    // })
+    // router.push('/')
+  } finally {
     LocalStorage.remove('token')
     LocalStorage.remove('permissions')
-    console.error('Error al cerrar sesión:', error)
-    Notify.create({
-      message: 'Error al cerrar sesión',
-      color: 'negative'
-    })
     router.push('/')
   }
 }

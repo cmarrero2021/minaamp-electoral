@@ -88,11 +88,14 @@ const logout = async () => {
     // Redirigir al login
     router.push('/')
   } catch (error) {
+    LocalStorage.remove('token')
+    LocalStorage.remove('permissions')
     console.error('Error al cerrar sesión:', error)
     Notify.create({
       message: 'Error al cerrar sesión',
       color: 'negative'
     })
+    router.push('/')
   }
 }
 </script>

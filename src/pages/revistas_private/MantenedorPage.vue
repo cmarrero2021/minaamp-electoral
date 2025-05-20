@@ -2,8 +2,18 @@
   <div class="q-pa-md">
     <h4 class="q-mb-md">SERVIDORES</h4>
 
-    <q-table title="Lista de Revistas" :rows="filteredJournals" :columns="columns" :rows-per-page-options="[10, 20, 50]"
-      row-key="id" :pagination="pagination" :loading="loading" virtual-scroll class="responsive-table">
+    <q-table
+      title="Lista de Revistas"
+      :rows="filteredJournals"
+      :columns="isQuickEditMode ? quickEditColumns : columns"
+      :rows-per-page-options="[10, 20, 50]"
+      row-key="id"
+      :pagination="pagination"
+      :loading="loading"
+      virtual-scroll
+      class="responsive-table"
+      :class="{ 'editing-mode': isQuickEditMode }"
+    >
       <!-- Búsqueda general y botón borrar filtros -->
       <template v-slot:top>
         <!-- Primera fila: Búsqueda general y botón borrar filtros -->
@@ -25,7 +35,7 @@
         </div>
 
         <!-- Segunda fila: Filtros para las columnas -->
-        <div class="full-width row wrap  items-center content-center q-mb-md">
+        <div class="full-width row wrap items-center content-center q-mb-md" v-if="!isQuickEditMode">
           <div class="col-xs-12 col-sm-6 col-md-3 q-pa-sm" v-for="col in columns" :key="col.name">
             <div v-if="col.filterable">
               <div v-if="col.type === 'select'">
@@ -51,24 +61,85 @@
         </div>
         <div class="col-xs-2 col-sm-1">
           <q-btn icon="add" title="Agregar nueva revista" @click="openNewModal" color="positive" size="sm"
-            class="full-width" v-if="hasPermission('view_admin')" />
+            class="full-width" v-if="hasPermission('view_admin') && !isQuickEditMode" />
         </div>
       </template>
 
-      <!-- Botones de acción en cada fila -->
-      <template v-slot:body-cell-actions="props">
-        <q-td>
+      <!-- Botones de acción en cada fila (modo normal) -->
+      <template v-slot:body-cell-actions="props" v-if="!isQuickEditMode">
+        <q-td :props="props">
           <div class="row items-center">
             <!-- Botón Editar -->
             <q-btn icon="edit" color="primary" title="Editar servidor" size="xs" @click.stop="openEditModal(props.row)"
               class="q-mr-xs" v-if="hasPermission('view_admin')" />
 
             <!-- Botón Marcas Votó -->
-            <q-btn icon="check" color="secondary" title="Marcar que el servidor votó" size="xs" class="q-mr-xs" v-if="hasPermission('view_admin')"/>
+            <q-btn icon="check" color="secondary" title="Marcar que el servidor votó" size="xs"
+              class="q-mr-xs" @click.stop="startQuickEdit(props.row)" v-if="hasPermission('view_admin')"/>
+
             <!-- Botón Borrar -->
-            <q-btn icon="delete" color="negative" title="Eliminar Servidor" size="xs" class="q-mr-xs" v-if="hasPermission('view_admin')" />
+            <q-btn icon="delete" color="negative" title="Eliminar Servidor" size="xs"
+              class="q-mr-xs" v-if="hasPermission('view_admin')" />
           </div>
         </q-td>
+      </template>
+
+      <!-- Celda de hora_voto (editable en modo rápido) -->
+      <template v-slot:body-cell-hora_voto="props">
+        <q-td :props="props" :class="{ 'editing-cell': isQuickEditMode && props.row === editingRow }">
+          <div v-if="isQuickEditMode && props.row === editingRow">
+            <q-input
+              v-model="editingRowData.hora_voto"
+              type="time"
+              dense
+              outlined
+              @update:model-value="handleTimeChange(props.row)"
+            />
+          </div>
+          <div v-else>
+            {{ props.value }}
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Celda de observaciones (editable en modo rápido) -->
+      <template v-slot:body-cell-observaciones="props">
+        <q-td :props="props" :class="{ 'editing-cell': isQuickEditMode && props.row === editingRow }">
+          <div v-if="isQuickEditMode && props.row === editingRow">
+            <q-input
+              v-model="editingRowData.observaciones"
+              type="text"
+              dense
+              outlined
+              @update:model-value="val => editingRowData.observaciones = val.toUpperCase()"
+            />
+          </div>
+          <div v-else>
+            {{ props.value }}
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Celda de controles (solo en modo rápido) -->
+      <template v-slot:body-cell-controles="props">
+        <q-td v-if="isQuickEditMode && props.row === editingRow">
+          <div class="row items-center justify-end">
+            <q-btn
+              icon="check"
+              color="positive"
+              size="sm"
+              @click.stop="saveQuickEdit(props.row)"
+              class="q-mr-xs"
+            />
+            <q-btn
+              icon="close"
+              color="negative"
+              size="sm"
+              @click.stop="cancelQuickEdit"
+            />
+          </div>
+        </q-td>
+        <q-td v-else-if="isQuickEditMode"></q-td>
       </template>
 
       <!-- Estado de carga -->
@@ -138,6 +209,10 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { LocalStorage, Notify } from 'quasar'
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 // Definición de columnas para la tabla
 const columns = [
   { name: 'actions', label: 'Acciones', align: 'left' },
@@ -145,10 +220,19 @@ const columns = [
   { name: 'nombres', label: 'Nombre', field: 'nombres', sortable: true, filterable: true, align: 'left', type: 'text' },
   { name: 'hora_voto', label: 'Votó', field: 'hora_voto', sortable: true, filterable: false, align: 'left', type: 'text' },
   { name: 'institucion', label: 'Institución', field: 'institucion', sortable: true, filterable: true, align: 'left', type: 'select' },
-  { name: 'sedes', label: 'Sede', field: 'sede', sortable: true, filterable: true, align: 'left', type: 'select' },
-  { name: 'areas', label: 'Área', field: 'area', sortable: true, filterable: true, align: 'left', type: 'select' },
+  { name: 'sede', label: 'Sede', field: 'sede', sortable: true, filterable: true, align: 'left', type: 'select' },
+  { name: 'area', label: 'Área', field: 'area', sortable: true, filterable: true, align: 'left', type: 'select' },
   { name: 'estado', label: 'Estado', field: 'estado', sortable: true, filterable: true, align: 'left', type: 'select' },
   { name: 'observaciones', label: 'Observaciones', field: 'observaciones', sortable: false, filterable: false, align: 'left', type: 'text' },
+];
+
+// Columnas para el modo edición rápida
+const quickEditColumns = [
+  { name: 'cedula', label: 'Cédula', field: 'cedula', sortable: true, align: 'left' },
+  { name: 'nombres', label: 'Nombre', field: 'nombres', sortable: true, align: 'left' },
+  { name: 'hora_voto', label: 'Votó', field: 'hora_voto', sortable: true, align: 'left' },
+  { name: 'observaciones', label: 'Observaciones', field: 'observaciones', sortable: false, align: 'left' },
+  { name: 'controles', label: 'Controles', align: 'right' }
 ];
 
 // URLs de los endpoints
@@ -168,6 +252,7 @@ const hasPermission = (permissionName) => {
   const permissions = LocalStorage.getItem('permissions') || []
   return permissions.some(p => p.name === permissionName)
 }
+
 // Estado de la aplicación
 const journals = ref([]);
 const loading = ref(true);
@@ -204,10 +289,16 @@ const optionsu = ref({
   estado: [],
 });
 
-
 // Estado del modal de edición
 const editDialog = ref(false);
 const editForm = ref({});
+const isEditing = ref(false);
+
+// Estado para el modo edición rápida
+const isQuickEditMode = ref(false);
+const editingRow = ref(null);
+const editingRowData = ref({});
+const originalRowData = ref({});
 
 // Función para obtener los datos de las revistas
 const fetchJournals = async () => {
@@ -225,7 +316,7 @@ const fetchJournals = async () => {
 const fetchOptions = async () => {
   try {
     const areasResponse = await axios.get(areasURL);
-    options.value.areas = areasResponse.data.map(item => item.area);
+    options.value.area = areasResponse.data.map(item => item.area);
     const areasResponseU = await axios.get(areasURL);
     optionsu.value.area = areasResponseU.data.map(item => ({
       label: item.area,
@@ -242,12 +333,14 @@ const fetchOptions = async () => {
     }));
     // Obtener sedes
     const sedesResponse = await axios.get(sedesURL);
-    options.value.sedes = sedesResponse.data.map(item => item.sede);
+    options.value.sede = sedesResponse.data.map(item => item.sede);
     const sedesResponseU = await axios.get(sedesURL);
     optionsu.value.sede = sedesResponseU.data.map(item => ({
       label: item.sede,
       value: item.id
     }));
+    console.table("area options: ",options.value.area)
+    console.table("area optionsu: ",optionsu.value.area)
 
     // Obtener estados
     const estadosResponse = await axios.get(estadosURL);
@@ -322,8 +415,8 @@ const filteredJournals = computed(() => {
       });
   });
 });
-const isEditing = ref(false);
-// Función para abrir el modal de creación!
+
+// Función para abrir el modal de creación
 const openNewModal = () => {
   editForm.value = {
     // Inicializa todos los campos necesarios
@@ -351,7 +444,7 @@ const openEditModal = async (journal) => {
     console.error('Error al obtener los datos del servidor:', error);
   }
 };
-////////////////////////
+
 // Función para cerrar el modal de edición
 const closeEditModal = () => {
   editDialog.value = false;
@@ -397,7 +490,7 @@ const saveChanges = async () => {
     await fetchJournals();
     closeEditModal();
   } catch (error) {
-    const cedula = servidorData.cedula;
+    const cedula = editForm.value.cedula;
     const mensaje = error.response.status === 409 ? `La cédula ${cedula} ya se encuentra registrada.` : `Ha ocurrido un error ${error} y no se han guardar los cambios.`;
     Notify.create({
       type: 'negative',
@@ -406,11 +499,55 @@ const saveChanges = async () => {
   }
 };
 
+// Funciones para el modo edición rápida
+const startQuickEdit = (row) => {
+  isQuickEditMode.value = true;
+  editingRow.value = row;
+  editingRowData.value = { ...row };
+  originalRowData.value = { ...row };
+};
 
-////////////////
+const cancelQuickEdit = () => {
+  isQuickEditMode.value = false;
+  editingRow.value = null;
+  editingRowData.value = {};
+  originalRowData.value = {};
+};
+
+const saveQuickEdit = async (row) => {
+  try {
+    const servidorData = {
+      cedula: row.cedula,
+      hora_voto: editingRowData.value.hora_voto,
+      observaciones: editingRowData.value.observaciones?.toUpperCase() ?? ''
+    };
+
+    await axios.patch(`${updateServerURL}${row.cedula}`, servidorData);
+
+    Notify.create({
+      type: 'positive',
+      message: 'Los cambios se han guardado correctamente.'
+    });
+
+    // Actualizar la fila en la tabla
+    Object.assign(row, editingRowData.value);
+    cancelQuickEdit();
+    await fetchJournals();
+  } catch (error) {
+    Notify.create({
+      type: 'negative',
+      message: `Error al guardar los cambios: ${error.message}`
+    });
+  }
+};
+
+const handleTimeChange = (row) => {
+  console.log('Hora cambiada:', editingRowData.value.hora_voto);
+};
+
 // Observar cambios en la paginación
 watch(pagination, () => {
-
+  // Lógica de paginación si es necesaria
 }, { deep: true });
 
 // Obtener los datos al montar el componente
@@ -433,5 +570,22 @@ onMounted(async () => {
   .responsive-table {
     overflow-x: scroll;
   }
+}
+
+/* Estilos para el modo edición rápida */
+.editing-mode .q-table__top {
+  background-color: #f5f5f5;
+}
+
+.editing-cell {
+  background-color: #e8f5e9;
+}
+
+.editing-row {
+  background-color: #e8f5e9;
+}
+
+.q-table__container.editing-mode {
+  border: 1px solid #4caf50;
 }
 </style>

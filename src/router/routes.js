@@ -42,6 +42,17 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/massive_elders",
+    component: () => import("layouts/MainLayout.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        component: () => import("pages/revistas_private/AdultosMasivosPage.vue"),
+      },
+    ],
+  },
 
   {
     path: "/inicio",

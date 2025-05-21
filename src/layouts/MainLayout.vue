@@ -38,7 +38,13 @@
           <q-item-section avatar>
             <q-icon name="people" />
           </q-item-section>
-          <q-item-section>Carga masiva</q-item-section>
+          <q-item-section>Carga masiva servidores</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple to="/massive_elders" v-if="hasPermission('view_admin')">
+          <q-item-section avatar>
+            <q-icon name="elderly" />
+          </q-item-section>
+          <q-item-section>Carga masiva adultos mayores</q-item-section>
         </q-item>
 
         <!-- Agrega más items según los permisos -->

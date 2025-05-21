@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <h4 class="q-mb-md">CARGA MASIVA DE SERVIDORES</h4>
+    <h4 class="q-mb-md">CARGA MASIVA DE ADULTOS MAYORES</h4>
 
     <!-- Input principal para cédulas -->
     <q-input
@@ -34,24 +34,24 @@
 
       <!-- Contenedor responsive para los resultados -->
       <div class="row q-col-gutter-md">
-        <!-- Cédulas actualizadas -->
-        <div class="col-xs-12 col-md-4">
+        <!-- Cédulas insertadas -->
+        <div class="col-xs-12 col-md-3">
           <div class="text-positive">
-            Actualizadas: {{ resultados.actualizadas.cantidad }}
+            Insertadas: {{ resultados.insertadas.cantidad }}
           </div>
           <q-input
-            v-model="cedulasActualizadas"
+            v-model="cedulasInsertadas"
             type="textarea"
             autogrow
             filled
             readonly
-            label="Cédulas actualizadas"
+            label="Cédulas insertadas"
             class="q-mt-xs"
           />
         </div>
 
         <!-- Cédulas rechazadas -->
-        <div class="col-xs-12 col-md-4">
+        <div class="col-xs-12 col-md-3">
           <div class="text-negative">
             Rechazadas: {{ resultados.rechazadas.cantidad }}
           </div>
@@ -67,9 +67,9 @@
         </div>
 
         <!-- Cédulas previamente cargadas -->
-        <div class="col-xs-12 col-md-4">
-          <div class="text-warning">
-            Previamente cargadas: {{ resultados.previamente_cargadas.cantidad }}
+        <div class="col-xs-12 col-md-3">
+          <div class="text-dark">
+            Previamente cargadas: {{ resultados.previamente_existentes.cantidad }}
           </div>
           <q-input
             v-model="cedulasPreviamenteCargadas"
@@ -78,6 +78,21 @@
             filled
             readonly
             label="Cédulas ya existentes"
+            class="q-mt-xs"
+          />
+        </div>
+        <!-- Cédulas rechazadas por edad -->
+        <div class="col-xs-12 col-md-3">
+          <div class="text-dark">
+            Menores a 60: {{ resultados.edad_insuficiente.cantidad }}
+          </div>
+          <q-input
+            v-model="cedulasRechazadasEdad"
+            type="textarea"
+            autogrow
+            filled
+            readonly
+            label="Cédulas de  menores a 60 años"
             class="q-mt-xs"
           />
         </div>
@@ -124,8 +139,8 @@ const dialogTitle = ref('');
 const dialogMessage = ref('');
 
 // Computed properties para los resultados
-const cedulasActualizadas = computed(() => {
-  return resultados.value?.actualizadas.cedulas?.join(', ') || '';
+const cedulasInsertadas = computed(() => {
+  return resultados.value?.insertadas.cedulas?.join(', ') || '';
 });
 
 const cedulasRechazadas = computed(() => {
@@ -133,7 +148,10 @@ const cedulasRechazadas = computed(() => {
 });
 
 const cedulasPreviamenteCargadas = computed(() => {
-  return resultados.value?.previamente_cargadas.cedulas?.join(', ') || '';
+  return resultados.value?.previamente_existentes.cedulas?.join(', ') || '';
+});
+const cedulasRechazadasEdad = computed(() => {
+  return resultados.value?.edad_insuficiente.cedulas?.join(', ') || '';
 });
 
 // Función para procesar las cédulas
@@ -151,9 +169,10 @@ const procesarCedulas = async () => {
     if (!cedulas) {
       throw new Error('No se detectaron cédulas válidas en el input');
     }
-    // Enviar al endpoint con el formato EXACTO que espera el backend
+
+        // Enviar al endpoint con el formato EXACTO que espera el backend
     const response = await axios.post(
-      import.meta.env.VITE_MU_SERVER_URL,
+      import.meta.env.VITE_MI_SERVER_URL,
       { cedulas: cedulas }, // Enviamos como objeto con propiedad cedulas
       {
         headers: {
@@ -164,7 +183,6 @@ const procesarCedulas = async () => {
 
     // Procesar respuesta
     resultados.value = response.data;
-
     // Mostrar notificación de éxito
     showDialog.value = true;
     dialogTitle.value = 'Proceso completado';

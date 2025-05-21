@@ -4,7 +4,7 @@
 
     <q-table
       title="Lista de Revistas"
-      :rows="filteredJournals"
+      :rows="filteredServers"
       :columns="isQuickEditMode ? quickEditColumns : columns"
       :rows-per-page-options="[10, 20, 50]"
       row-key="id"
@@ -58,6 +58,25 @@
               </div>
             </div>
           </div>
+          <!-- ///////////////////////////// -->
+<!-- En el template, dentro del v-slot:top, después de los filtros existentes -->
+<div class="full-width row wrap items-center q-mb-md" v-if="!isQuickEditMode">
+  <!-- Agregar esto después de los otros filtros -->
+  <div class="col-3 q-pa-sm">
+    <div class="text-caption q-mb-xs">Filtrar por estado del voto:</div>
+    <q-slider
+      v-model="votoFilter"
+      :min="1"
+      :max="3"
+      :step="1"
+      snap
+      markers
+      label-always
+      :label-value="votoFilter === 1 ? 'Todos' : votoFilter === 2 ? 'Votaron' : 'No Votaron'"
+    />
+  </div>
+</div>
+          <!-- ///////////////////////////// -->
         </div>
         <div class="col-xs-2 col-sm-1">
           <q-btn icon="add" title="Agregar nueva revista" @click="openNewModal" color="positive" size="sm"
@@ -212,7 +231,7 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-
+const votoFilter = ref(1); // 1=Todos, 2=Votaron, 3=No votaron
 // Definición de columnas para la tabla
 const columns = [
   { name: 'actions', label: 'Acciones', align: 'left' },
@@ -255,7 +274,7 @@ const hasPermission = (permissionName) => {
 }
 
 // Estado de la aplicación
-const journals = ref([]);
+const servers = ref([]);
 const loading = ref(true);
 const pagination = ref({
   sortBy: 'desc',
@@ -302,10 +321,10 @@ const editingRowData = ref({});
 const originalRowData = ref({});
 
 // Función para obtener los datos de las revistas
-const fetchJournals = async () => {
+const fetchServers = async () => {
   try {
     const response = await axios.get(servidoresURL);
-    journals.value = response.data;
+    servers.value = response.data;
   } catch (error) {
     console.error('Error al obtener las revistas:', error);
   } finally {
@@ -371,6 +390,7 @@ const clearAllFilters = () => {
     filters.value[filter] = null;
   }
   searchQuery.value = '';
+  votoFilter.value = 1;
 };
 
 // Borrar la búsqueda general
@@ -384,37 +404,44 @@ const getOptions = (filterName) => {
 };
 
 // Calcular la lista de revistas filtradas
-const filteredJournals = computed(() => {
-  // Primero filtrar por búsqueda general
+/////////////////////////
+const filteredServers = computed(() => {
+  // Primero filtrar por estado de voto
+  let votofilteredServers = servers.value.filter(server => {
+    if (votoFilter.value === 1) return true; // Todos
+    if (votoFilter.value === 2) return server.hora_voto; // Votaron
+    return !server.hora_voto; // No votaron
+  });
+
+  // Luego filtrar por búsqueda general
   const searchValue = searchQuery.value.toLowerCase();
-  let searchedJournals = journals.value.filter(journal => {
-    // Buscar en todos los campos de las columnas filtrables
+  let searchedServers = votofilteredServers.filter(server => {
     return columns
       .filter(col => col.filterable)
       .some(col => {
-        const journalValue = journal[col.field]?.toString()?.toLowerCase() || '';
-        return journalValue.includes(searchValue);
+        const serverValue = server[col.field]?.toString()?.toLowerCase() || '';
+        return serverValue.includes(searchValue);
       });
   });
 
-  // Luego aplicar los filtros por columna
-  return searchedJournals.filter(journal => {
+  // Finalmente aplicar los filtros por columna
+  return searchedServers.filter(server => {
     return columns
       .filter(col => col.filterable)
       .every(col => {
         // Para filtros de tipo select
         if (col.type === 'select' && filters.value[col.name] && filters.value[col.name].length > 0) {
-          return filters.value[col.name].includes(journal[col.field]);
+          return filters.value[col.name].includes(server[col.field]);
         }
 
         // Para otros tipos de filtros
         const filterValue = filters.value[col.name]?.toLowerCase() || '';
-        const journalValue = journal[col.field]?.toString()?.toLowerCase() || '';
-        return journalValue.includes(filterValue);
+        const serverValue = server[col.field]?.toString()?.toLowerCase() || '';
+        return serverValue.includes(filterValue);
       });
   });
 });
-
+/////////////////////////
 // Función para abrir el modal de creación
 const openNewModal = () => {
   editForm.value = {
@@ -433,9 +460,9 @@ const openNewModal = () => {
 };
 
 // Función para abrir el modal de edición
-const openEditModal = async (journal) => {
+const openEditModal = async (server) => {
   try {
-    const response = await axios.get(`${servidorDetailURL}${journal.cedula}`);
+    const response = await axios.get(`${servidorDetailURL}${server.cedula}`);
     editForm.value = { ...response.data };
     editDialog.value = true;
     isEditing.value = true;
@@ -486,7 +513,7 @@ const saveChanges = async () => {
     }
 
     // Actualizar la lista de revistas
-    await fetchJournals();
+    await fetchServers();
     closeEditModal();
   } catch (error) {
     const cedula = editForm.value.cedula;
@@ -531,7 +558,7 @@ const saveQuickEdit = async (row) => {
     // Actualizar la fila en la tabla
     Object.assign(row, editingRowData.value);
     cancelQuickEdit();
-    await fetchJournals();
+    await fetchServers();
   } catch (error) {
     Notify.create({
       type: 'negative',
@@ -578,7 +605,7 @@ const eliminarServidor = async (servidor) => {
     });
 
     // Actualizar la lista
-    await fetchJournals();
+    await fetchServers();
   } catch (error) {
     console.error('Error al eliminar servidor:', error);
     Notify.create({
@@ -600,7 +627,7 @@ onMounted(async () => {
     router.push('/login')
   }
   await fetchOptions();
-  fetchJournals();
+  fetchServers();
 });
 </script>
 
@@ -631,5 +658,25 @@ onMounted(async () => {
 
 .q-table__container.editing-mode {
   border: 1px solid #4caf50;
+}
+/* Estilos para el slider de filtrado */
+.q-slider__track-container {
+  height: 8px;
+}
+
+.q-slider__marker-labels-container {
+  margin-top: 10px;
+}
+
+.q-slider__marker-label {
+  font-size: 0.8rem;
+}
+
+.q-slider--dark .q-slider__track {
+  background: #1976d2;
+}
+
+.q-slider--dark .q-slider__selection {
+  background: #0d47a1;
 }
 </style>

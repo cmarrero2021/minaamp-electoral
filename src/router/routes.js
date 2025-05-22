@@ -61,10 +61,21 @@ const routes = [
     children: [
       {
         path: "",
-        component: () => import("pages/revistas_private/InicioPage.vue"),
+        component: () => import("pages/revistas_public/EstadisticasPage.vue"),
       },
     ],
   },
+  // {
+  //   path: "/inicio",
+  //   component: () => import("layouts/MainLayout.vue"),
+  //   meta: { requiresAuth: true },
+  //   children: [
+  //     {
+  //       path: "",
+  //       component: () => import("pages/revistas_private/InicioPage.vue"),
+  //     },
+  //   ],
+  // },
   {
     path: "/:catchAll(.*)*",
       component: () => import("pages/login/LoginPage.vue"),

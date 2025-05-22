@@ -5,7 +5,7 @@
     <div v-if="!isTableVisible">
       <div ref="chartContainer"
         style="width: 100%; background-color: white; padding: 20px; border-radius: 10px; position: relative;">
-        <div style="width: 100%; height: 200px; position: relative">
+        <div style="width: 100%; height: 400px; position: relative">
           <canvas ref="chartCanvas" style="width: 100%; height: 600px"></canvas>
         </div>
       </div>

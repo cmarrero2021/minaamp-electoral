@@ -11,8 +11,12 @@
       </div>
     </div>
     <!-- Contenido principal: Mapa -->
+    <!-- <div class="map-container"> -->
     <div class="map-container">
-      <MapComponent />
+      <MapComponent/>
+    </div>
+    <div class="map-container">
+      <MapServerComponent />
     </div>
 
     <!-- Contenido principal: Gráficos -->
@@ -56,6 +60,7 @@ import { Notify } from "quasar";
 import axios from "axios";
 import ChartComponent from "src/components/ChartComponent.vue";
 import MapComponent from 'src/components/MapComponent.vue';
+import MapServerComponent from 'src/components/MapServerComponent.vue';
 import socket from "src/services/websocket.js";
 
 // Variables de entorno
@@ -85,8 +90,6 @@ const customTitles1 = {
   cant_idiomas: "IDIOMA",
   cant_editoriales: "EDITORIAL",
 };
-console.table(customTitles)
-console.table(customTitles1)
 // Mapeo de claves a imágenes
 const imageMap = {
   revistas: "/img/cant_revistas.png",
@@ -125,7 +128,6 @@ const fetchData = async () => {
 
 // Función para obtener el título personalizado basado en el valor
 const getCustomTitle = (key, value) => {
-  console.log(`Key: ${key}, Value: ${value}`);
   if (value === "1") {
     return customTitles1[key] || formatKey(key); // Usar customTitles1 si value es 1
   } else {
@@ -174,7 +176,6 @@ const tableColumns7 = [
 // Ciclo de vida
 onMounted(() => {
   // const qBtns = document.querySelectorAll('.q-btn');
-  // console.log('Elementos seleccionados2:', qBtns);
   // // Itera sobre cada elemento seleccionado y modifica el padding
   // qBtns.forEach(btn => {
   //   btn.style.cssText += 'padding: 4px 4px !important;';
@@ -222,7 +223,6 @@ onUnmounted(() => {
   height: 400px;
   width: 100%;
   margin-bottom: 20px;
-  /* Separación vertical de 5px */
 }
 
 .charts-container {
@@ -230,13 +230,9 @@ onUnmounted(() => {
   /* Separación vertical de 5px */
 }
 
-/* .btn-content {
-  padding: "4px 16px" !important;
-}
-
-@media (max-width: 600px) {
-  .btn-content {
-    padding: "1px 1px" !important;
-  }
-} */
+@media (max-width: 767px) {
+.map-container {
+  margin-bottom: 300px;
+  width:95%;
+}}
 </style>

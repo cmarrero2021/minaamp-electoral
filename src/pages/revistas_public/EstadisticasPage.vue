@@ -23,32 +23,7 @@
     <div class="charts-container row justify-center flex flex-center">
       <div class="row" style="width: 100%; max-width: 1600px; margin: 0 auto">
         <!-- Gráfico 1: Áreas de Conocimiento -->
-        <ChartComponent title="REVISTAS POR ÁREA DE CONOCIMIENTO" :endpoint="grAreasUrl" dataKey="area_conocimiento"
-          valueKey="cant_area" :tableColumns="tableColumns1" />
-
-        <!-- Gráfico 2: Índices -->
-        <ChartComponent title="REVISTAS POR ÍNDICE" :endpoint="grIndicesUrl" dataKey="indice" valueKey="cant_inddice"
-          :tableColumns="tableColumns2" />
-
-        <!-- Gráfico 3: Idiomas -->
-        <ChartComponent title="REVISTAS POR IDIOMA" :endpoint="grIdiomasUrl" dataKey="idioma" valueKey="cant_idioma"
-          :tableColumns="tableColumns3" />
-
-        <!-- Gráfico 4: Editoriales -->
-        <ChartComponent title="REVISTAS POR EDITORIAL" :endpoint="grEditorialesUrl" dataKey="editorial"
-          valueKey="cant_editorial" :tableColumns="tableColumns4" />
-
-        <!-- Gráfico 5: Periodicidades -->
-        <ChartComponent title="REVISTAS POR PERIODICIDAD" :endpoint="grPeriodicidadesUrl" dataKey="periodicidad"
-          valueKey="cant_periodicidad" :tableColumns="tableColumns5" />
-
-        <!-- Gráfico 6: Formatos -->
-        <ChartComponent title="REVISTAS POR FORMATO" :endpoint="grFormatosUrl" dataKey="formato" valueKey="cant_formato"
-          :tableColumns="tableColumns6" />
-
-        <!-- Gráfico 7: Estados -->
-        <ChartComponent title="REVISTAS POR ESTADO" :endpoint="grEstadosUrl" dataKey="estado" valueKey="cant_estado"
-          :tableColumns="tableColumns7" />
+        <MovilizacionChartComponent />
       </div>
     </div>
   </q-page>
@@ -59,6 +34,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { Notify } from "quasar";
 import axios from "axios";
 import ChartComponent from "src/components/ChartComponent.vue";
+import MovilizacionChartComponent from "src/components/MovilizacionChartComponent.vue";
 import MapComponent from 'src/components/MapComponent.vue';
 import MapServerComponent from 'src/components/MapServerComponent.vue';
 import socket from "src/services/websocket.js";
